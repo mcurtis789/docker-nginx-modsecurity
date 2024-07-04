@@ -1,3 +1,50 @@
+The readme leaves a few things out
+```
+sudo mkdir -p /data/nginx/conf.d/
+sudo nano /data/nginx/conf.d/webex.mbcurtis.com.conf
+```
+```
+    upstream dev.mbcurtis.com {
+        server 1.1.1.1;
+    }
+
+    server {
+        listen       80;
+
+        server_name  dev.mbcurtis.com;
+        modsecurity on;
+
+        location / {
+            proxy_pass http://dev.mbcurtis.com/;
+            proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+            proxy_redirect off;
+            proxy_buffering off;
+            proxy_force_ranges on;
+            proxy_set_header        Host            $host;
+            proxy_set_header        X-Real-IP       $remote_addr;
+            proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        }
+
+}
+```
+
+then start the docker 
+```
+docker run --name nginx-modsecurity \
+  --restart=always \
+  --net=host \
+  -v /data/nginx/conf.d:/etc/nginx/conf.d:rw \
+  -v /data/letsencrypt:/etc/letsencrypt:rw \
+  -p 80:80 -p 443:443 -d \
+  really/nginx-modsecurity
+```
+
+after which you can run certbot which will add the SSL config to your site file
+```
+docker exec -it nginx-modsecurity certbot --no-redirect --nginx -d example.com
+```
+
 # really/nginx-modsecurity
 Docker container providing [nginx](https://www.nginx.com) with [modsecurity] (https://www.modsecurity.org), [lua](https://www.nginx.com/resources/wiki/modules/lua/) and certbot for [Let's Encrypt](https://letsencrypt.org) SSL certificates
 
