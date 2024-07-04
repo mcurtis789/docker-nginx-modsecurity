@@ -1,21 +1,21 @@
 The readme leaves a few things out
 ```
 sudo mkdir -p /data/nginx/conf.d/
-sudo nano /data/nginx/conf.d/webex.mbcurtis.com.conf
+sudo nano /data/nginx/conf.d/www.example.com.conf
 ```
 ```
-    upstream dev.mbcurtis.com {
+    upstream www.example.com {
         server 1.1.1.1;
     }
 
     server {
         listen       80;
 
-        server_name  dev.mbcurtis.com;
+        server_name  www.example.com;
         modsecurity on;
 
         location / {
-            proxy_pass http://dev.mbcurtis.com/;
+            proxy_pass http://www.example.com/;
             proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
             proxy_redirect off;
             proxy_buffering off;
@@ -42,7 +42,7 @@ docker run --name nginx-modsecurity \
 
 after which you can run certbot which will add the SSL config to your site file
 ```
-docker exec -it nginx-modsecurity certbot --no-redirect --nginx -d example.com
+docker exec -it nginx-modsecurity certbot --no-redirect --nginx -d www.example.com
 ```
 
 # really/nginx-modsecurity
